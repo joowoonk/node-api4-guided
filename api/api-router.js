@@ -2,6 +2,8 @@ const express = require("express");
 
 const Shouts = require("../shouts/shouts-model.js");
 
+const restricted = require("../auth/restricted-middleware");
+
 const router = express.Router();
 
 router.use(express.json());
@@ -12,30 +14,30 @@ router.get("/", (req, res) => {
 
 router.get("/shouts", (req, res, next) => {
   Shouts.find()
-    .then(shouts => {
+    .then((shouts) => {
       res.status(200).json(shouts);
     })
-    .catch(error => next(error));
+    .catch((error) => next(error));
 });
 
-router.post("/shouts", (req, res, next) => {
+router.post("/shouts", restricted, (req, res, next) => {
   Shouts.add(req.body)
-    .then(shout => {
+    .then((shout) => {
       res.status(201).json(shout);
     })
-    .catch(error => next(error));
+    .catch((error) => next(error));
 });
 
 router.delete("/shouts/:id", (req, res) => {
   Shouts.remove(req.params.id)
-    .then(count => {
+    .then((count) => {
       if (count) {
         res.status(204).end();
       } else {
         res.status(404).json({ message: "not found" });
       }
     })
-    .catch(error => next(error));
+    .catch((error) => next(error));
 });
 
 router.use(errorHandler);
